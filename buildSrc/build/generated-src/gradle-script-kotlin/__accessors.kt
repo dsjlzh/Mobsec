@@ -38,6 +38,12 @@ fun Project.`reporting`(configure: org.gradle.api.reporting.ReportingExtension.(
     extensions.getByName<org.gradle.api.reporting.ReportingExtension>("reporting").apply { configure() }
 
 /**
+ * Retrieves or configures the [buildOutputs][org.gradle.api.NamedDomainObjectContainer<com.android.build.gradle.api.BaseVariantOutput>] project extension.
+ */
+fun Project.`buildOutputs`(configure: org.gradle.api.NamedDomainObjectContainer<com.android.build.gradle.api.BaseVariantOutput>.() -> Unit = {}) =
+    extensions.getByName<org.gradle.api.NamedDomainObjectContainer<com.android.build.gradle.api.BaseVariantOutput>>("buildOutputs").apply { configure() }
+
+/**
  * Retrieves or configures the [android][com.android.build.gradle.AppExtension] project extension.
  */
 fun Project.`android`(configure: com.android.build.gradle.AppExtension.() -> Unit = {}) =

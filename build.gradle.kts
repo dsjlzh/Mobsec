@@ -4,6 +4,8 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:3.0.0-alpha2")
         classpath(kotlinModule("gradle-plugin", "1.1.2-4"))
+        classpath(kotlinModule("android", "1.1.2-4"))
+        classpath(kotlinModule("android-extensions", "1.1.2-4"))
     }
     repositories {
         maven { url = uri("https://maven.google.com") }
@@ -30,6 +32,12 @@ android {
         versionName = "1.0"
     }
 
+    sourceSets {
+        getByName("main") {
+            java.srcDir("src/main/kotlin")
+        }
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -39,11 +47,13 @@ android {
 }
 
 dependencies {
-    compile(fileTree("libs").include("*.jar"))
-    compile("com.android.support:appcompat-v7:25.3.1")
-    compile("com.android.support.constraint:constraint-layout:1.0.2")
-    compile(kotlinModule("stdlib", "1.1.2-4"))
-    compile("org.jetbrains.anko:anko:0.10.1")
+    implementation(fileTree("libs").include("*.jar"))
+    implementation("com.android.support:appcompat-v7:25.3.1")
+    implementation("com.android.support.constraint:constraint-layout:1.0.2")
+    implementation(kotlinModule("stdlib", "1.1.2-4"))
+    implementation(kotlinModule("reflect", "1.1.2-4"))
+    testImplementation(kotlinModule("test", "1.1.2-4"))
+    implementation("org.jetbrains.anko:anko:0.10.1")
 }
 
 kotlin { // configure<org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension>
