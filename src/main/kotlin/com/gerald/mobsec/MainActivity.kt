@@ -19,8 +19,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val msg = "Scan start (fake)"
+
         btn_scan.onClick {
-            toast("Scan start (fake)")
+            toast(msg)
         }
     }
 }

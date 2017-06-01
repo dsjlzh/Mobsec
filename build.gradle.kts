@@ -1,11 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
-val kotlin_version = "1.1.2-4"
-val anko_version = "0.10.0"
 
 buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:3.0.0-alpha2")
-        classpath(kotlinModule("gradle-plugin"))
+        classpath(kotlinModule("gradle-plugin", "1.1.2-4"))
     }
     repositories {
         maven { url = uri("https://maven.google.com") }
@@ -44,8 +42,8 @@ dependencies {
     compile(fileTree("libs").include("*.jar"))
     compile("com.android.support:appcompat-v7:25.3.1")
     compile("com.android.support.constraint:constraint-layout:1.0.2")
-    compile(kotlinModule("stdlib"))
-    compile("org.jetbrains.anko:anko:$anko_version") {
+    compile(kotlinModule("stdlib", "1.1.2-4"))
+    compile("org.jetbrains.anko:anko:0.10.1") {
         exclude(group = "com.google.android", module = "android")
     }
 }
