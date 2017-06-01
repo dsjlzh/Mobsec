@@ -43,9 +43,7 @@ dependencies {
     compile("com.android.support:appcompat-v7:25.3.1")
     compile("com.android.support.constraint:constraint-layout:1.0.2")
     compile(kotlinModule("stdlib", "1.1.2-4"))
-    compile("org.jetbrains.anko:anko:0.10.1") {
-        exclude(group = "com.google.android", module = "android")
-    }
+    compile("org.jetbrains.anko:anko:0.10.1")
 }
 
 kotlin { // configure<org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension>
