@@ -6,11 +6,12 @@ import android.text.*
 import android.text.InputType.TYPE_CLASS_TEXT
 import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
 import android.view.Gravity
+import android.widget.TextView
 import android.widget.Button
 import android.widget.EditText
+
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -20,10 +21,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val msg = "Scan start (fake)"
+        val msg = stringFromJNI()
 
         btn_scan.onClick {
             toast(msg)
         }
     }
+
+    external fun stringFromJNI(): String
+
+    companion object {
+        init {
+            System.loadLibrary("hello-jni")
+        }
+    }
+
 }

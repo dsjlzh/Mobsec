@@ -4,7 +4,6 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:3.0.0-alpha2")
         classpath(kotlinModule("gradle-plugin", "1.1.2-4"))
-        classpath(kotlinModule("android", "1.1.2-4"))
         classpath(kotlinModule("android-extensions", "1.1.2-4"))
     }
     repositories {
@@ -36,6 +35,10 @@ android {
         getByName("main") {
             java.srcDir("src/main/kotlin")
         }
+    }
+
+    externalNativeBuild {
+        ndkBuild.setPath("src/main/jni/Android.mk")
     }
 
     buildTypes {
