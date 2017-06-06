@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 buildscript {
     dependencies {
-        classpath("com.android.tools.build:gradle:3.0.0-alpha2")
+        classpath("com.android.tools.build:gradle:3.0.0-alpha3")
         classpath(kotlinModule("gradle-plugin", "1.1.2-4"))
         classpath(kotlinModule("android-extensions", "1.1.2-4"))
     }
@@ -23,8 +23,8 @@ android {
     compileSdkVersion(25)
 
     defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(25)
+        minSdkVersion(15)
+        targetSdkVersion(23)
 
         applicationId = "com.gerald.mobsec"
         versionCode = 1
@@ -46,6 +46,10 @@ android {
             isMinifyEnabled = false
             proguardFiles("proguard-rules.pro")
         }
+    }
+
+    dexOptions {
+        javaMaxHeapSize = "4g"
     }
 }
 

@@ -21,15 +21,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val msg = stringFromJNI()
-
         btn_scan.onClick {
+            val msg = resultFromJNI()
             toast(msg)
         }
     }
 
-    external fun stringFromJNI(): String
+    // keyword external in kotlin same as native in java
+    external fun resultFromJNI(): String
 
+    // https://medium.com/@vanniktech/java-vs-kotlin-static-initializer-block-269c4902c439
     companion object {
         init {
             System.loadLibrary("hello-jni")
