@@ -6,6 +6,13 @@
 
 #include "checker.h"
 
+int check_all()
+{
+    int result = 0;
+    // Todo: make checker handler array
+    return result;
+}
+
 int check_cve_2017_0589()
 {
 	void *libso;
@@ -28,8 +35,8 @@ int check_cve_2017_0589()
 	fun_end = fun_begin + 160;
 	while (fun_begin <= fun_end) {
 		if (*fun_begin == 0xff &&
-		    !memcpy(fun_begin + 2, &m1, 3) &&
-		    !memcpy(fun_begin + 6, &m2, 2))
+		    !memcmp(fun_begin + 2, &m1, 3) &&
+		    !memcmp(fun_begin + 6, &m2, 2))
 			return 0;
 		fun_begin += 2;
 	}

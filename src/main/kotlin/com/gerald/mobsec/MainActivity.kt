@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     // keyword external in kotlin same as native in java
     external fun resultFromJNI(): String
 
-    // https://medium.com/@vanniktech/java-vs-kotlin-static-initializer-block-269c4902c439
+    /* https://medium.com/@vanniktech/java-vs-kotlin-static-initializer-block-269c4902c439 */
     companion object {
         init {
             System.loadLibrary("hello-jni")

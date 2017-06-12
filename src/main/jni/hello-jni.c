@@ -14,15 +14,22 @@
  * limitations under the License.
  *
  */
+
 #include <string.h>
 #include <jni.h>
 #include "checker.h"
+#include "hot-patch.h"
+
 
 JNIEXPORT jstring JNICALL
 Java_com_gerald_mobsec_MainActivity_resultFromJNI( JNIEnv* env,
                                                   jobject thiz )
 {
-	int result;
+	int result = 0;
+
+	if (!g_patched)
+		patch_all();
+
 	result = check_cve_2017_0589();
 	if (result ==  0)
 		return (*env)->NewStringUTF(env, "secure :) ");
