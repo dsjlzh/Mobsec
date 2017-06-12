@@ -28,35 +28,41 @@ int patch_all()
 
 int patch_linker_is_accessible()
 {
-    dl_info_t *info;
-    if (!(info = dlopen_in_memory("/system/bin/linker", 0)))
+    u_long base;
+    u_long sym_off;
+
+    const char *filename = "/system/bin/linker";
+    const char *sym_name = "__dl__ZN19android_namespace_t13is_accessibleERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE";
+
+    if (!(base = dlopen_in_mem(filename)))
         return -1;
+
+    if (!(sym_off = dlsym_in_mem(filename, sym_name)))
+        return -1;
+
+    u_long sym_addr = (base + sym_off) & ~1;
+
+    if (mprotect((void *)(sym_addr & 0xFFFFF000), 0x1020, PROT_READ|PROT_WRITE|PROT_EXEC) != 0)
+        return -1;
+
+    *(u_int32_t *)sym_addr = 0x46F72001;
 
     return 0;
 }
 
-void *dlopen_in_memory(const char* filename, int flags)
+u_long dlopen_in_mem(const char* filename)
 {
     u_long addr;
-    int fd;
-    size_t len = 0;
-    char *elf;
-    Elf32_Ehdr *ehdr;
-    Elf32_Shdr *shdr;
-    int count = 0;
-    dl_info_t *info;
-    FILE *maps;
     char buf[256];
-    size_t buf_size = 256;
     bool found = false;
 
     // b19fb000-b1a5a000 r-xp 00000000 103:09 246       /system/bin/linker
-    maps = fopen("/proc/self/maps", "r");
+    FILE *maps = fopen("/proc/self/maps", "r");
     if (!maps) {
         return NULL;
     }
 
-    while (fgets(buf, (int)buf_size, maps)) {
+    while (fgets(buf, sizeof(buf), maps)) {
         if (strstr(buf, "r-xp") && strstr(buf, filename)) {
             found = true;
             break;
@@ -70,57 +76,63 @@ void *dlopen_in_memory(const char* filename, int flags)
     if (sscanf(buf, "%lx", &addr) != 1)
         return NULL;
 
+    return addr;
+}
+
+u_long dlsym_in_mem(const char *filename, const char *sym_name)
+{
+    int fd;
+    size_t len = 0;
+
     if ((fd = open(filename, O_RDONLY)) < 0)
         return NULL;
 
     if ((len = (size_t)lseek(fd, 0, SEEK_END)) <= 0)
         return NULL;
 
-    elf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
+    char *elf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
     if (elf == MAP_FAILED) {
         munmap(elf, len);
         return NULL;
     }
 
-    info = (dl_info_t *)malloc(sizeof(dl_info_t));
-    memset(info, 0, sizeof(dl_info_t));
-    info->base = addr;
+    Elf32_Ehdr *ehdr = (Elf32_Ehdr *)elf;
+    Elf32_Shdr *shdr = (Elf32_Shdr *)(elf + ehdr->e_shoff);
+    Elf32_Shdr *hdr_shstr = shdr + ehdr->e_shstrndx;
+    if (hdr_shstr->sh_type != SHT_STRTAB)
+        return NULL;
 
-    ehdr = (Elf32_Ehdr *)elf;
-    shdr = (Elf32_Shdr *)(elf + ehdr->e_shoff);
-    while (count < ehdr->e_shnum) {
-        switch (shdr->sh_type) {
-            case SHT_DYNSYM:
-                if (!info->dynsym) {
-                    info->dynsym = malloc(shdr->sh_size);
-                    memcpy(info->dynsym, elf + shdr->sh_offset, shdr->sh_size);
-                    info->dynsym_size = shdr->sh_size >> 4;
-                }
-                break;
-            case SHT_STRTAB:
-                if (!info->dynstr) {
-                    info->dynstr = malloc(shdr->sh_size);
-                    memcpy(info->dynstr, elf + shdr->sh_offset, shdr->sh_size);
-                }
-                break;
-            case SHT_PROGBITS:
-                if (info->dynsym && info->dynstr) {
-                    info->text = shdr->sh_addr - shdr->sh_offset;
-                    count = ehdr->e_shnum;
-                }
-                break;
-            default:
-                break;
+    char *shstrtab = elf + hdr_shstr->sh_offset;
+    char *symtab = NULL;
+    char *strtab = NULL;
+    int sym_num = 0;
+    int i = 0;
+
+    for (i = 0; i < ehdr->e_shnum; i++) {
+        if (strcmp(shstrtab + shdr->sh_name, ".symtab") == 0) {
+            symtab = elf + shdr->sh_offset;
+            sym_num = shdr->sh_size / shdr->sh_entsize;
+        } else if (strcmp(shstrtab + shdr->sh_name, ".strtab") == 0) {
+            strtab = elf + shdr->sh_offset;
         }
-        count++;
         shdr++;
     }
-    munmap(elf, len);
 
-    if (!info->dynstr || !info->dynsym) {
+    if (!symtab || !strtab)
         return NULL;
+
+    Elf32_Sym *sym = (Elf32_Sym *)symtab + 1;
+    u_long offset = 0;
+    for (i = 1; i < sym_num; i++) {
+        if (strcmp(strtab + sym->st_name, sym_name) == 0) {
+            offset = sym->st_value;
+            break;
+        }
+        sym++;
     }
 
-    return info;
+    munmap(elf, len);
+
+    return offset;
 }
