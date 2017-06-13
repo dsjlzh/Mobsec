@@ -11,7 +11,6 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <sys/param.h>
 #include <elf.h>
 
 #include "hot-patch.h"
@@ -40,9 +39,9 @@ int patch_linker_is_accessible()
     if (!(sym_off = dlsym_in_mem(filename, sym_name)))
         return -1;
 
-    u_long sym_addr = (base + sym_off) & ~1;
+    u_long sym_addr = base + sym_off;
 
-    if (mprotect((void *)(sym_addr & 0xFFFFF000), 0x1020, PROT_READ|PROT_WRITE|PROT_EXEC) != 0)
+    if (mprotect((void *)(sym_addr & 0xFFFFF000), 0x1000, PROT_READ|PROT_WRITE|PROT_EXEC) != 0)
         return -1;
 
     *(u_int32_t *)sym_addr = 0x46F72001;
@@ -126,7 +125,7 @@ u_long dlsym_in_mem(const char *filename, const char *sym_name)
     u_long offset = 0;
     for (i = 1; i < sym_num; i++) {
         if (strcmp(strtab + sym->st_name, sym_name) == 0) {
-            offset = sym->st_value;
+            offset = sym->st_value & ~1;
             break;
         }
         sym++;
