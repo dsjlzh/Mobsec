@@ -15,24 +15,20 @@ int check_all()
 
 int check_cve_2017_0589()
 {
-	void *libso;
-	uint8_t *fun_begin;
-	uint8_t *fun_end;
 	uint8_t m1[3] = {0xf, 0xe3, 0x7f};
 	uint8_t m2[2] = {0x47, 0xe3};
+    const char *filename = "/system/lib/libstagefright_soft_hevcdec.so";
 
-
-	libso = dlopen("/system/lib/libstagefright_soft_hevcdec.so", RTLD_LAZY);
-	if (!libso) {
+    void *libso = dlopen(filename, RTLD_LAZY);
+	if (!libso)
 		return -1;
-	}
 
-	fun_begin = (uint8_t *)dlsym(libso, "ihevcd_cabac_init");
-	if (!fun_begin) {
+    const char * symbol = "ihevcd_cabac_init";
+    uint8_t *fun_begin = (uint8_t *)dlsym(libso, symbol);
+	if (!fun_begin)
 		return -1;
-	}
 
-	fun_end = fun_begin + 160;
+    uint8_t *fun_end = fun_begin + 160;
 	while (fun_begin <= fun_end) {
 		if (*fun_begin == 0xff &&
 		    !memcmp(fun_begin + 2, &m1, 3) &&

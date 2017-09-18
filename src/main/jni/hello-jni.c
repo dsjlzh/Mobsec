@@ -25,16 +25,19 @@ JNIEXPORT jstring JNICALL
 Java_com_gerald_mobsec_MainActivity_resultFromJNI( JNIEnv* env,
                                                   jobject thiz )
 {
-	int result = 0;
+	if (!g_patched) {
+		if (!patch_all()) {
+            // debug msg, comment in release
+            return (*env)->NewStringUTF(env, "Patch failed!");
+        }
+	}
 
-	if (!g_patched)
-		patch_all();
-
+    int result = 0;
 	result = check_cve_2017_0589();
 	if (result ==  0)
 		return (*env)->NewStringUTF(env, "secure :) ");
 	else if (result == 1)
 		return (*env)->NewStringUTF(env, "vulnerable :( ");
 	else
-		return (*env)->NewStringUTF(env, "error :( ");
+		return (*env)->NewStringUTF(env, "error!!! ");
 }

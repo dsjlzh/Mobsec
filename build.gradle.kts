@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 buildscript {
     dependencies {
-        classpath("com.android.tools.build:gradle:3.0.0-beta1")
+        classpath("com.android.tools.build:gradle:3.0.0-beta6")
         classpath(kotlin("gradle-plugin"))
         classpath(kotlin("android-extensions"))
     }
@@ -23,8 +23,8 @@ android {
     compileSdkVersion(25)
 
     defaultConfig {
-        minSdkVersion(15)
-        targetSdkVersion(23)
+        minSdkVersion(23)
+        targetSdkVersion(25)
 
         applicationId = "com.gerald.mobsec"
         versionCode = 1

@@ -8,45 +8,56 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <elf.h>
 
 #include "hot-patch.h"
 
+#define SYM_COUNT 2
+
 int g_patched = 0;
 
-int patch_all()
+bool patch_all()
 {
-    int result = 0;
-    result += patch_linker_is_accessible();
     g_patched = 1;
-    return result;
+
+    if (!patch_linker())
+        return false;
+
+    return true;
 }
 
-int patch_linker_is_accessible()
+bool patch_linker()
 {
-    u_long base;
-    u_long sym_off;
-
+    u_long base = 0;
     const char *filename = "/system/bin/linker";
-    const char *sym_name = "__dl__ZN19android_namespace_t13is_accessibleERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE";
 
     if (!(base = dlopen_in_mem(filename)))
-        return -1;
+        return false;
 
-    if (!(sym_off = dlsym_in_mem(filename, sym_name)))
-        return -1;
+    const char *sym_name[SYM_COUNT] = {
+            "__dl__ZN19android_namespace_t13is_accessibleERKNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE",
+            "__dl__ZL13is_greylistedPKcPK6soinfo"};
+    u_long sym_off[SYM_COUNT];
 
-    u_long sym_addr = base + sym_off;
+    if (dlsym_in_mem(filename, sym_name, sym_off)) {
+        for (int i = 0; i < SYM_COUNT; i++)
+            if (!patch_linker_internal(base + sym_off[i]))
+                return false;
+    }
 
+    return true;
+}
+
+bool patch_linker_internal(u_long sym_addr)
+{
     if (mprotect((void *)(sym_addr & 0xFFFFF000), 0x1000, PROT_READ|PROT_WRITE|PROT_EXEC) != 0)
-        return -1;
+        return false;
 
     *(u_int32_t *)sym_addr = 0x46F72001;
 
-    return 0;
+    return true;
 }
 
 u_long dlopen_in_mem(const char* filename)
@@ -57,9 +68,8 @@ u_long dlopen_in_mem(const char* filename)
 
     // b19fb000-b1a5a000 r-xp 00000000 103:09 246       /system/bin/linker
     FILE *maps = fopen("/proc/self/maps", "r");
-    if (!maps) {
-        return NULL;
-    }
+    if (!maps)
+        return 0;
 
     while (fgets(buf, sizeof(buf), maps)) {
         if (strstr(buf, "r-xp") && strstr(buf, filename)) {
@@ -70,43 +80,44 @@ u_long dlopen_in_mem(const char* filename)
     fclose(maps);
 
     if (!found)
-        return NULL;
+        return 0;
 
     if (sscanf(buf, "%lx", &addr) != 1)
-        return NULL;
+        return 0;
 
     return addr;
 }
 
-u_long dlsym_in_mem(const char *filename, const char *sym_name)
+bool dlsym_in_mem(const char *filename, const char *sym_name[],
+                    u_long sym_off[])
 {
     int fd;
     size_t len = 0;
 
     if ((fd = open(filename, O_RDONLY)) < 0)
-        return NULL;
+        return false;
 
     if ((len = (size_t)lseek(fd, 0, SEEK_END)) <= 0)
-        return NULL;
+        return false;
 
     char *elf = mmap(NULL, len, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
     if (elf == MAP_FAILED) {
         munmap(elf, len);
-        return NULL;
+        return false;
     }
 
     Elf32_Ehdr *ehdr = (Elf32_Ehdr *)elf;
     Elf32_Shdr *shdr = (Elf32_Shdr *)(elf + ehdr->e_shoff);
     Elf32_Shdr *hdr_shstr = shdr + ehdr->e_shstrndx;
     if (hdr_shstr->sh_type != SHT_STRTAB)
-        return NULL;
+        return false;
 
     char *shstrtab = elf + hdr_shstr->sh_offset;
     char *symtab = NULL;
     char *strtab = NULL;
     int sym_num = 0;
-    int i = 0;
+    int i = 0, j = 0;
 
     for (i = 0; i < ehdr->e_shnum; i++) {
         if (strcmp(shstrtab + shdr->sh_name, ".symtab") == 0) {
@@ -119,19 +130,27 @@ u_long dlsym_in_mem(const char *filename, const char *sym_name)
     }
 
     if (!symtab || !strtab)
-        return NULL;
+        return false;
 
-    Elf32_Sym *sym = (Elf32_Sym *)symtab + 1;
-    u_long offset = 0;
-    for (i = 1; i < sym_num; i++) {
-        if (strcmp(strtab + sym->st_name, sym_name) == 0) {
-            offset = sym->st_value & ~1;
-            break;
+    Elf32_Sym *sym;
+    bool found;
+    for (j = 0; j < SYM_COUNT; j++) {
+        sym = (Elf32_Sym *)symtab + 1;
+        found = false;
+        for (i = 1; i < sym_num; i++) {
+            if (strcmp(strtab + sym->st_name, sym_name[j]) == 0) {
+                found = true;
+                sym_off[j] = sym->st_value & ~1;
+                break;
+            }
+            sym++;
         }
-        sym++;
+        if (!found) {
+            munmap(elf, len);
+            return false;
+        }
     }
 
     munmap(elf, len);
-
-    return offset;
+    return true;
 }
