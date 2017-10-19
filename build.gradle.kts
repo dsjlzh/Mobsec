@@ -60,7 +60,7 @@ dependencies {
     compile(kotlin("stdlib"))
     compile(kotlin("reflect"))
     testCompile(kotlin("test"))
-    compile("org.jetbrains.anko:anko:0.10.1")
+    compile("org.jetbrains.anko:anko:0.10.2")
 }
 
 kotlin { // configure<org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension>

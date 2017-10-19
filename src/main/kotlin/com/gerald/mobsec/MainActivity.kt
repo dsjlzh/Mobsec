@@ -2,13 +2,13 @@ package com.gerald.mobsec
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.text.*
-import android.text.InputType.TYPE_CLASS_TEXT
-import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-import android.view.Gravity
-import android.widget.TextView
-import android.widget.Button
-import android.widget.EditText
+//import android.text.*
+//import android.text.InputType.TYPE_CLASS_TEXT
+//import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+//import android.view.Gravity
+//import android.widget.TextView
+//import android.widget.Button
+//import android.widget.EditText
 
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
