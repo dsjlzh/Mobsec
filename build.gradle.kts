@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
-
+/*
 buildscript {
     dependencies {
-        classpath("com.android.tools.build:gradle:3.0.0-beta6")
-        classpath(kotlin("gradle-plugin"))
-        classpath(kotlin("android-extensions"))
+        classpath("com.android.tools.build:gradle:3.0.0")
+        classpath(kotlin("gradle-plugin", "1.1.51"))
+        classpath(kotlin("android-extensions", "1.1.51"))
     }
     repositories {
         maven { url = uri("https://maven.google.com") }
@@ -16,6 +16,12 @@ apply {
     plugin("com.android.application")
     plugin("kotlin-android")
     plugin("kotlin-android-extensions")
+}
+*/
+plugins {
+    id("com.android.application") version "2.3.3"
+    kotlin("android") version "1.1.51"
+    kotlin("android.extensions") version "1.1.51"
 }
 
 android {
@@ -57,9 +63,9 @@ dependencies {
     compile(fileTree("libs").include("*.jar"))
     compile("com.android.support:appcompat-v7:25.3.1")
     compile("com.android.support.constraint:constraint-layout:1.0.2")
-    compile(kotlin("stdlib"))
-    compile(kotlin("reflect"))
-    testCompile(kotlin("test"))
+    compile(kotlin("stdlib", "1.1.51"))
+    compile(kotlin("reflect", "1.1.51"))
+    testCompile(kotlin("test", "1.1.51"))
     compile("org.jetbrains.anko:anko:0.10.2")
 }
 
