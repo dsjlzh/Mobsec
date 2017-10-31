@@ -1,23 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
-/*
-buildscript {
-    dependencies {
-        classpath("com.android.tools.build:gradle:3.0.0")
-        classpath(kotlin("gradle-plugin", "1.1.51"))
-        classpath(kotlin("android-extensions", "1.1.51"))
-    }
-    repositories {
-        maven { url = uri("https://maven.google.com") }
-        jcenter()
-    }
-}
 
-apply {
-    plugin("com.android.application")
-    plugin("kotlin-android")
-    plugin("kotlin-android-extensions")
-}
-*/
 plugins {
     id("com.android.application") version "2.3.3"
     kotlin("android") version "1.1.51"
@@ -35,6 +17,10 @@ android {
         applicationId = "com.gerald.mobsec"
         versionCode = 1
         versionName = "1.0"
+
+        ndk {
+            abiFilters("armeabi-v7a", "arm64-v8a")
+        }
     }
 
     sourceSets {
