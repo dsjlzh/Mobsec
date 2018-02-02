@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 plugins {
-    id("com.android.application") version "2.3.3"
-    kotlin("android") version "1.1.51"
-    kotlin("android.extensions") version "1.1.51"
+    id("com.android.application") version "3.0.1"
+    kotlin("android") version "1.2.21"
+    kotlin("android.extensions") version "1.2.21"
 }
 
 android {
-    buildToolsVersion("25.0.3")
+    buildToolsVersion("26.0.2")
     compileSdkVersion(25)
 
     defaultConfig {
@@ -49,10 +49,10 @@ dependencies {
     compile(fileTree("libs").include("*.jar"))
     compile("com.android.support:appcompat-v7:25.3.1")
     compile("com.android.support.constraint:constraint-layout:1.0.2")
-    compile(kotlin("stdlib", "1.1.51"))
-    compile(kotlin("reflect", "1.1.51"))
-    testCompile(kotlin("test", "1.1.51"))
-    compile("org.jetbrains.anko:anko:0.10.2")
+    compile(kotlin("stdlib", "1.2.21"))
+    compile(kotlin("reflect", "1.2.21"))
+    // testCompile(kotlin("test", "1.2.21"))
+    compile("org.jetbrains.anko:anko:0.10.4")
 }
 
 kotlin { // configure<org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension>
@@ -62,7 +62,6 @@ kotlin { // configure<org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension>
 allprojects {
     repositories {
         jcenter()
-        maven { url = uri("https://maven.google.com") }
         mavenCentral()
     }
 }
