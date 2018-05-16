@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
+val kotlinVersion: String = "1.2.41"
+
 plugins {
     id("com.android.application") version "3.1.2"
     kotlin("android") version "1.2.41"
@@ -7,7 +9,7 @@ plugins {
 }
 
 android {
-    buildToolsVersion("27.0.3")
+//    buildToolsVersion("27.0.3")
     compileSdkVersion(25)
 
     defaultConfig {
@@ -47,11 +49,11 @@ android {
 
 dependencies {
     implementation(fileTree("libs").include("*.jar"))
-    implementation("com.android.support:appcompat-v7:25.3.1")
-    implementation("com.android.support.constraint:constraint-layout:1.0.2")
-    implementation(kotlin("stdlib", "1.2.41"))
-    implementation(kotlin("reflect", "1.2.41"))
-    // testimplementation(kotlin("test", "1.2.41"))
+    implementation("com.android.support:appcompat-v7:25.4.0")
+    implementation("com.android.support.constraint:constraint-layout:1.1.0")
+    implementation(kotlin("stdlib", kotlinVersion))
+    implementation(kotlin("reflect", kotlinVersion))
+    testImplementation(kotlin("test", kotlinVersion))
     implementation("org.jetbrains.anko:anko:0.10.5")
 }
 
@@ -63,5 +65,6 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
+        google()
     }
 }
