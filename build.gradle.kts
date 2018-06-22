@@ -1,15 +1,15 @@
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
-val kotlinVersion: String = "1.2.41"
+val kotlinVersion: String = "1.2.50"
 
 plugins {
-    id("com.android.application") version "3.1.2"
-    kotlin("android") version "1.2.41"
-    kotlin("android.extensions") version "1.2.41"
+    id("com.android.application") version "3.1.3"
+    kotlin("android") version "1.2.50"
+    kotlin("android.extensions") version "1.2.50"
 }
 
 android {
-//    buildToolsVersion("27.0.3")
+    buildToolsVersion("27.0.3")
     compileSdkVersion(25)
 
     defaultConfig {
@@ -50,7 +50,7 @@ android {
 dependencies {
     implementation(fileTree("libs").include("*.jar"))
     implementation("com.android.support:appcompat-v7:25.4.0")
-    implementation("com.android.support.constraint:constraint-layout:1.1.0")
+    implementation("com.android.support.constraint:constraint-layout:1.1.2")
     implementation(kotlin("stdlib", kotlinVersion))
     implementation(kotlin("reflect", kotlinVersion))
     testImplementation(kotlin("test", kotlinVersion))
