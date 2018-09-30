@@ -1,70 +1,27 @@
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-val kotlinVersion: String = "1.2.50"
-
-plugins {
-    id("com.android.application") version "3.1.3"
-    kotlin("android") version "1.2.50"
-    kotlin("android.extensions") version "1.2.50"
-}
-
-android {
-    buildToolsVersion("27.0.3")
-    compileSdkVersion(25)
-
-    defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(25)
-
-        applicationId = "com.gerald.mobsec"
-        versionCode = 1
-        versionName = "1.0"
-
-        ndk {
-            abiFilters("armeabi-v7a", "arm64-v8a")
-        }
+buildscript {
+    repositories {
+        google()
+        jcenter()
     }
+    dependencies {
+        classpath("com.android.tools.build:gradle:3.2.0")
+        classpath(kotlin("gradle-plugin", version = "1.2.71"))
 
-    sourceSets {
-        getByName("main") {
-            java.srcDir("src/main/kotlin")
-        }
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle.kts files
     }
-
-    externalNativeBuild {
-        ndkBuild.setPath("src/main/jni/Android.mk")
-    }
-
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            proguardFiles("proguard-rules.pro")
-        }
-    }
-
-    dexOptions {
-        javaMaxHeapSize = "4g"
-    }
-}
-
-dependencies {
-    implementation(fileTree("libs").include("*.jar"))
-    implementation("com.android.support:appcompat-v7:25.4.0")
-    implementation("com.android.support.constraint:constraint-layout:1.1.2")
-    implementation(kotlin("stdlib", kotlinVersion))
-    implementation(kotlin("reflect", kotlinVersion))
-    testImplementation(kotlin("test", kotlinVersion))
-    implementation("org.jetbrains.anko:anko:0.10.5")
-}
-
-kotlin { // configure<org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension>
-    experimental.coroutines = Coroutines.ENABLE
 }
 
 allprojects {
     repositories {
+        google()
         jcenter()
         mavenCentral()
-        google()
     }
+}
+
+tasks.register("clean", Delete::class) {
+    delete(rootProject.buildDir)
 }
