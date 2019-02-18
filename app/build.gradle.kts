@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
+// import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 
 plugins {
